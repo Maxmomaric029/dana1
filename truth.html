@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<title>TRUTH</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+:root {
+  --red: #ff2040;
+  --red2: #ff4060;
+  --purple: #a855f7;
+  --glass: rgba(255,255,255,0.05);
+  --glass-border: rgba(255,255,255,0.09);
+  --glass-hover: rgba(255,255,255,0.08);
+  --text: rgba(255,255,255,0.92);
+  --text-dim: rgba(255,255,255,0.38);
+  --bg-blob1: #2d0010;
+  --bg-blob2: #0d0020;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  min-height: 100vh;
+  background: #0a0008;
+  font-family: 'Syne', sans-serif;
+  color: var(--text);
+  overflow-x: hidden;
+  user-select: none;
+}
+
+/* BACKGROUND BLOBS */
+.bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.55;
+}
+.blob-1 {
+  width: 340px; height: 340px;
+  background: radial-gradient(circle, #8b000a 0%, transparent 70%);
+  top: -80px; right: -80px;
+  animation: float1 8s ease-in-out infinite;
+}
+.blob-2 {
+  width: 280px; height: 280px;
+  background: radial-gradient(circle, #3b0068 0%, transparent 70%);
+  bottom: 100px; left: -60px;
+  animation: float2 10s ease-in-out infinite;
+}
+.blob-3 {
+  width: 180px; height: 180px;
+  background: radial-gradient(circle, #ff2040 0%, transparent 70%);
+  top: 55%; right: 10%;
+  opacity: 0.15;
+  animation: float1 6s ease-in-out infinite reverse;
+}
+
+@keyframes float1 {
+  0%,100% { transform: translate(0,0); }
+  50% { transform: translate(-20px, 25px); }
+}
+@keyframes float2 {
+  0%,100% { transform: translate(0,0); }
+  50% { transform: translate(15px, -20px); }
+}
+
+/* LAYOUT */
+.page {
+  position: relative;
+  z-index: 1;
+  padding: 20px 16px 90px;
+  max-width: 420px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* HEADER */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px;
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
+
+.wordmark {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 6px;
+  color: #fff;
+}
+.wordmark span { color: var(--red); }
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.live-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,32,64,0.12);
+  border: 1px solid rgba(255,32,64,0.25);
+  border-radius: 20px;
+  padding: 4px 12px;
+}
+.live-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--red);
+  box-shadow: 0 0 8px var(--red);
+  animation: blink 1.4s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+.live-text {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--red2);
+  letter-spacing: 2px;
+}
+
+/* CARD */
+.card {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  overflow: hidden;
+  transition: border-color 0.3s;
+}
+
+.card-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 18px 9px;
+}
+
+.card-label i {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.card-label span {
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  font-weight: 700;
+}
+
+/* TOGGLE ROW */
+.row {
+  display: flex;
+  align-items: center;
+  padding: 13px 18px;
+  gap: 14px;
+  border-top: 1px solid var(--glass-border);
+  transition: background 0.2s;
+  position: relative;
+}
+.row:hover { background: var(--glass-hover); }
+.row:first-of-type { border-top: none; }
+
+.row-icon {
+  width: 36px; height: 36px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: var(--text-dim);
+  flex-shrink: 0;
+  transition: all 0.25s;
+}
+
+.row.on .row-icon {
+  background: rgba(255,32,64,0.15);
+  color: var(--red2);
+}
+.row.purple-row.on .row-icon {
+  background: rgba(168,85,247,0.15);
+  color: var(--purple);
+}
+
+.row-info { flex: 1; min-width: 0; }
+
+.row-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: 0.2px;
+}
+
+.row-sub {
+  font-size: 11px;
+  color: var(--text-dim);
+  font-family: 'DM Mono', monospace;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* RISK BADGE */
+.risk-badge {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  color: var(--red);
+  border: 1px solid rgba(255,32,64,0.3);
+  border-radius: 20px;
+  padding: 2px 8px;
+  animation: risk-pulse 1.8s ease-in-out infinite;
+  white-space: nowrap;
+}
+@keyframes risk-pulse {
+  0%,100% { opacity:1; border-color: rgba(255,32,64,0.3); }
+  50% { opacity:0.4; border-color: transparent; }
+}
+
+/* SWITCH */
+.sw { position: relative; width: 46px; height: 26px; flex-shrink: 0; }
+.sw input { display: none; }
+.sw-track {
+  position: absolute; inset: 0;
+  border-radius: 13px;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.1);
+  cursor: pointer;
+  transition: all 0.28s cubic-bezier(.4,0,.2,1);
+}
+.sw-thumb {
+  position: absolute;
+  top: 4px; left: 4px;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.25);
+  transition: all 0.28s cubic-bezier(.4,0,.2,1);
+}
+.sw input:checked ~ .sw-track {
+  background: rgba(255,32,64,0.2);
+  border-color: rgba(255,32,64,0.5);
+  box-shadow: 0 0 16px rgba(255,32,64,0.2);
+}
+.sw input:checked ~ .sw-track .sw-thumb {
+  left: 24px;
+  background: var(--red);
+  box-shadow: 0 0 10px var(--red);
+}
+/* purple */
+.sw.purple input:checked ~ .sw-track {
+  background: rgba(168,85,247,0.2);
+  border-color: rgba(168,85,247,0.5);
+  box-shadow: 0 0 16px rgba(168,85,247,0.2);
+}
+.sw.purple input:checked ~ .sw-track .sw-thumb {
+  left: 24px;
+  background: var(--purple);
+  box-shadow: 0 0 10px var(--purple);
+}
+/* danger */
+.sw.danger input:checked ~ .sw-track {
+  background: rgba(255,32,64,0.25);
+  border-color: var(--red);
+  box-shadow: 0 0 24px rgba(255,32,64,0.35), 0 0 48px rgba(255,32,64,0.1);
+}
+.sw.danger input:checked ~ .sw-track .sw-thumb {
+  left: 24px;
+  background: var(--red);
+  box-shadow: 0 0 14px var(--red), 0 0 28px rgba(255,32,64,0.5);
+}
+
+/* SLIDER CARD */
+.slider-card {
+  padding: 16px 18px;
+  border-top: 1px solid var(--glass-border);
+}
+.slider-card:first-of-type { border-top: none; }
+
+.slider-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.slider-left-info { display: flex; align-items: center; gap: 12px; }
+.slider-icon {
+  width: 36px; height: 36px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: var(--text-dim);
+}
+.slider-name { font-size: 14px; font-weight: 700; }
+.slider-sub { font-size: 11px; color: var(--text-dim); font-family: 'DM Mono', monospace; margin-top: 2px; }
+.slider-num {
+  font-family: 'DM Mono', monospace;
+  font-size: 18px;
+  font-weight: 400;
+  color: var(--red2);
+  min-width: 72px;
+  text-align: right;
+  letter-spacing: -0.5px;
+}
+
+/* RANGE */
+input[type=range] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 3px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.4), 0 0 0 3px rgba(255,32,64,0.3);
+  cursor: pointer;
+  transition: box-shadow 0.2s;
+}
+input[type=range]:active::-webkit-slider-thumb {
+  box-shadow: 0 2px 12px rgba(0,0,0,0.4), 0 0 0 5px rgba(255,32,64,0.4);
+}
+
+/* BOTTOM BAR */
+.bottom {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  z-index: 100;
+  padding: 12px 16px;
+  background: rgba(10,0,8,0.7);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border-top: 1px solid var(--glass-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.stats {
+  display: flex;
+  gap: 20px;
+}
+.stat { text-align: center; }
+.stat-n {
+  font-family: 'DM Mono', monospace;
+  font-size: 15px;
+  color: var(--red2);
+  display: block;
+}
+.stat-l {
+  font-size: 9px;
+  color: var(--text-dim);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.apply-btn {
+  flex: 1;
+  background: var(--red);
+  color: #fff;
+  border: none;
+  border-radius: 16px;
+  padding: 13px;
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 24px rgba(255,32,64,0.3);
+}
+.apply-btn:active {
+  transform: scale(0.97);
+  box-shadow: 0 2px 12px rgba(255,32,64,0.4);
+}
+
+/* TOAST */
+.toast {
+  position: fixed;
+  top: 24px; left: 50%;
+  transform: translateX(-50%) scale(0.92);
+  background: rgba(20,5,15,0.9);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(20px);
+  border-radius: 20px;
+  padding: 10px 22px;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: var(--text-dim);
+  letter-spacing: 1px;
+  opacity: 0;
+  transition: all 0.25s cubic-bezier(.4,0,.2,1);
+  pointer-events: none;
+  z-index: 9999;
+  white-space: nowrap;
+}
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) scale(1);
+}
+
+/* STAGGER ANIMATION */
+.card { opacity: 0; transform: translateY(16px); animation: fadeUp 0.4s forwards; }
+.card:nth-child(1) { animation-delay: 0.05s; }
+.card:nth-child(2) { animation-delay: 0.12s; }
+.card:nth-child(3) { animation-delay: 0.19s; }
+.card:nth-child(4) { animation-delay: 0.26s; }
+.header { opacity: 0; animation: fadeUp 0.3s 0s forwards; }
+
+@keyframes fadeUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+</style>
+</head>
+<body>
+
+<div class="bg">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="wordmark">TRUT<span>H</span></div>
+    <div class="header-right">
+      <div class="live-pill">
+        <div class="live-dot"></div>
+        <div class="live-text">LIVE</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CARD 1: DEVICE -->
+  <div class="card">
+    <div class="card-label">
+      <i class="fa-solid fa-mobile-screen"></i>
+      <span>Device</span>
+    </div>
+
+    <div class="row" id="r-regedit">
+      <div class="row-icon"><i class="fa-solid fa-sliders"></i></div>
+      <div class="row-info">
+        <div class="row-name">Regedit Mobile</div>
+        <div class="row-sub">sensitivity · response</div>
+      </div>
+      <label class="sw">
+        <input type="checkbox" onchange="tog(this,'r-regedit','Regedit Mobile')"/>
+        <div class="sw-track"><div class="sw-thumb"></div></div>
+      </label>
+    </div>
+
+    <div class="row" id="r-sensi">
+      <div class="row-icon"><i class="fa-solid fa-bolt"></i></div>
+      <div class="row-info">
+        <div class="row-name">Sensi Extrema</div>
+        <div class="row-sub">acceleration override</div>
+      </div>
+      <label class="sw">
+        <input type="checkbox" onchange="tog(this,'r-sensi','Sensi Extrema')"/>
+        <div class="sw-track"><div class="sw-thumb"></div></div>
+      </label>
+    </div>
+
+    <div class="row" id="r-touch">
+      <div class="row-icon"><i class="fa-solid fa-hand-pointer"></i></div>
+      <div class="row-info">
+        <div class="row-name">Touch Calibration</div>
+        <div class="row-sub">120Hz forced</div>
+      </div>
+      <label class="sw">
+        <input type="checkbox" onchange="tog(this,'r-touch','Touch Calibration')"/>
+        <div class="sw-track"><div class="sw-thumb"></div></div>
+      </label>
+    </div>
+
+    <div class="row purple-row on" id="r-antiban">
+      <div class="row-icon"><i class="fa-solid fa-shield-halved"></i></div>
+      <div class="row-info">
+        <div class="row-name">Anti-Blacklist</div>
+        <div class="row-sub">protection active</div>
+      </div>
+      <label class="sw purple">
+        <input type="checkbox" checked onchange="tog(this,'r-antiban','Anti-Blacklist')"/>
+        <div class="sw-track"><div class="sw-thumb"></div></div>
+      </label>
+    </div>
+  </div>
+
+  <!-- CARD 2: PERFORMANCE -->
+  <div class="card">
+    <div class="card-label">
+      <i class="fa-solid fa-gauge-high"></i>
+      <span>Performance</span>
+    </div>
+
+    <div class="slider-card">
+      <div class="slider-top">
+        <div class="slider-left-info">
+          <div class="slider-icon"><i class="fa-solid fa-expand"></i></div>
+          <div>
+            <div class="slider-name">DPI Force</div>
+            <div class="slider-sub">400 – 2000</div>
+          </div>
+        </div>
+        <div class="slider-num" id="dpi-v">1200</div>
+      </div>
+      <input type="range" min="400" max="2000" value="1200" step="10"
+        oninput="document.getElementById('dpi-v').textContent=this.value"/>
+    </div>
+
+    <div class="slider-card">
+      <div class="slider-top">
+        <div class="slider-left-info">
+          <div class="slider-icon"><i class="fa-solid fa-wave-square"></i></div>
+          <div>
+            <div class="slider-name">Suppressor Delay</div>
+            <div class="slider-sub">0 – 100ms</div>
+          </div>
+        </div>
+        <div class="slider-num" id="sup-v">0ms</div>
+      </div>
+      <input type="range" min="0" max="100" value="0" step="1"
+        oninput="document.getElementById('sup-v').textContent=this.value+'ms'"/>
+    </div>
+  </div>
+
+  <!-- CARD 3: COMBAT -->
+  <div class="card">
+    <div class="card-label">
+      <i class="fa-solid fa-crosshairs"></i>
+      <span>Combat</span>
+    </div>
+
+    <div class="row" id="r-aimlock">
+      <div class="row-icon"><i class="fa-solid fa-bullseye"></i></div>
+      <div class="row-info">
+        <div class="row-name">AimLock Direct</div>
+        <div class="row-sub">nearest target lock</div>
+      </div>
+      <label class="sw">
+        <input type="checkbox" onchange="tog(this,'r-aimlock','AimLock Direct')"/>
+        <div class="sw-track"><div class="sw-thumb"></div></div>
+      </label>
+    </div>
+
+    <div class="row" id="r-hitbox">
+      <div class="row-icon"><i class="fa-solid fa-person-rays"></i></div>
+      <div class="row-info">
+        <div class="row-name">Hitbox Expander</div>
+        <div class="row-sub">OBB · damage area</div>
+      </div>
+      <label class="sw">
+        <input type="checkbox" onchange="tog(this,'r-hitbox','Hitbox Expander')"/>
+        <div class="sw-track"><div class="sw-thumb"></div></div>
+      </label>
+    </div>
+
+    <div class="row" id="r-magic">
+      <div class="row-icon"><i class="fa-solid fa-skull-crossbones"></i></div>
+      <div class="row-info">
+        <div class="row-name">Magic Bullet</div>
+        <div class="row-sub">high risk enabled</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="risk-badge">RISK</span>
+        <label class="sw danger">
+          <input type="checkbox" onchange="tog(this,'r-magic','Magic Bullet')"/>
+          <div class="sw-track"><div class="sw-thumb"></div></div>
+        </label>
+      </div>
+    </div>
+
+    <div class="slider-card">
+      <div class="slider-top">
+        <div class="slider-left-info">
+          <div class="slider-icon"><i class="fa-solid fa-eye"></i></div>
+          <div>
+            <div class="slider-name">FOV Radius</div>
+            <div class="slider-sub">10° – 360°</div>
+          </div>
+        </div>
+        <div class="slider-num" id="fov-v">90°</div>
+      </div>
+      <input type="range" min="10" max="360" value="90" step="1"
+        oninput="document.getElementById('fov-v').textContent=this.value+'°'"/>
+    </div>
+  </div>
+
+  <!-- CARD 4: EXTERNAL -->
+  <div class="card">
+    <div class="card-label">
+      <i class="fa-solid fa-server"></i>
+      <span>External</span>
+    </div>
+
+    <div class="row purple-row" id="r-ext">
+      <div class="row-icon"><i class="fa-solid fa-network-wired"></i></div>
+      <div class="row-info">
+        <div class="row-name">External Aimbot</div>
+        <div class="row-sub">kernel layer</div>
+      </div>
+      <label class="sw purple">
+        <input type="checkbox" onchange="tog(this,'r-ext','External Aimbot')"/>
+        <div class="sw-track"><div class="sw-thumb"></div></div>
+      </label>
+    </div>
+
+    <div class="row" id="r-macro">
+      <div class="row-icon"><i class="fa-solid fa-computer-mouse"></i></div>
+      <div class="row-info">
+        <div class="row-name">Macro No-Recoil</div>
+        <div class="row-sub">hardware bypass</div>
+      </div>
+      <label class="sw">
+        <input type="checkbox" onchange="tog(this,'r-macro','Macro No-Recoil')"/>
+        <div class="sw-track"><div class="sw-thumb"></div></div>
+      </label>
+    </div>
+  </div>
+
+</div>
+
+<!-- BOTTOM BAR -->
+<div class="bottom">
+  <div class="stats">
+    <div class="stat">
+      <span class="stat-n" id="act-n">1</span>
+      <span class="stat-l">Active</span>
+    </div>
+    <div class="stat">
+      <span class="stat-n" id="ping-n">14ms</span>
+      <span class="stat-l">Ping</span>
+    </div>
+    <div class="stat">
+      <span class="stat-n" id="time-n">00:00</span>
+      <span class="stat-l">Session</span>
+    </div>
+  </div>
+  <button class="apply-btn" onclick="apply()">APPLY</button>
+</div>
+
+<script>
+function tog(input, rowId, name) {
+  const r = document.getElementById(rowId);
+  r.classList.toggle('on', input.checked);
+  count();
+  toast(input.checked ? name + ' on' : name + ' off');
+}
+
+function count() {
+  const n = document.querySelectorAll('.sw input:checked').length;
+  document.getElementById('act-n').textContent = n;
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.classList.remove('show'), 1600);
+}
+
+function apply() {
+  toast('config applied');
+}
+
+// antiban default on
+document.getElementById('r-antiban').classList.add('on');
+
+// fake ping
+setInterval(() => {
+  document.getElementById('ping-n').textContent = (Math.random()*18+8|0) + 'ms';
+}, 3000);
+
+// session timer
+let s = 0;
+setInterval(() => {
+  s++;
+  const mm = String(s/60|0).padStart(2,'0');
+  const ss = String(s%60).padStart(2,'0');
+  document.getElementById('time-n').textContent = mm+':'+ss;
+}, 1000);
+</script>
+</body>
+</html>

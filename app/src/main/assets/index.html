@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<title>TRUTH</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+:root {
+  --red: #ff2040;
+  --red2: #ff4060;
+  --purple: #a855f7;
+  --glass: rgba(255,255,255,0.05);
+  --glass-border: rgba(255,255,255,0.09);
+  --glass-hover: rgba(255,255,255,0.08);
+  --text: rgba(255,255,255,0.92);
+  --text-dim: rgba(255,255,255,0.38);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+/* The body is transparent so we only see the menu container */
+html, body {
+  background: transparent;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  font-family: 'Syne', sans-serif;
+  color: var(--text);
+  user-select: none;
+}
+
+/* CONTAINER */
+.app-container {
+  width: 340px;
+  height: 480px;
+  background: rgba(10,0,8,0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 0 30px rgba(0,0,0,0.5), inset 0 0 20px rgba(255,32,64,0.05);
+  overflow: hidden;
+  position: relative;
+}
+
+/* HEADER (Draggable Area in Android) */
+.header {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  background: rgba(255,255,255,0.02);
+  border-bottom: 1px solid var(--glass-border);
+}
+.wordmark { font-size: 20px; font-weight: 800; letter-spacing: 4px; color: #fff; }
+.wordmark span { color: var(--red); }
+.header-actions { display: flex; gap: 8px; }
+.action-btn {
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  color: var(--text-dim);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.action-btn:active { background: var(--glass-hover); }
+.action-btn.red { color: var(--red2); }
+
+/* TABS */
+.tabs {
+  display: flex;
+  gap: 4px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--glass-border);
+  background: rgba(0,0,0,0.2);
+}
+.tab {
+  flex: 1;
+  padding: 10px 0;
+  text-align: center;
+  border-radius: 12px;
+  color: var(--text-dim);
+  font-size: 14px;
+  transition: 0.2s;
+  cursor: pointer;
+}
+.tab.active {
+  background: rgba(255,32,64,0.15);
+  color: var(--red2);
+}
+
+/* CONTENT */
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+  /* hide scrollbar */
+  -ms-overflow-style: none; scrollbar-width: none;
+}
+.content::-webkit-scrollbar { display: none; }
+
+.page { display: none; flex-direction: column; gap: 8px; animation: fade 0.3s; }
+.page.active { display: flex; }
+@keyframes fade { from{opacity:0; transform:translateY(8px)} to{opacity:1; transform:none} }
+
+/* ROW (Switches) Same style as original but smaller */
+.row {
+  display: flex; align-items: center; padding: 12px 14px; gap: 12px;
+  background: var(--glass); border: 1px solid var(--glass-border); border-radius: 14px;
+}
+.row-icon {
+  width: 32px; height: 32px; border-radius: 10px; background: rgba(255,255,255,0.06);
+  display: flex; align-items: center; justify-content: center; font-size: 13px; color: var(--text-dim);
+}
+.row.on .row-icon { background: rgba(255,32,64,0.15); color: var(--red2); }
+.row.purple-row.on .row-icon { background: rgba(168,85,247,0.15); color: var(--purple); }
+.row-info { flex: 1; min-width: 0; }
+.row-name { font-size: 13px; font-weight: 700; letter-spacing: 0.2px; }
+.row-sub { font-size: 10px; color: var(--text-dim); font-family: 'DM Mono', monospace; margin-top: 2px; }
+
+/* SW (Switch) */
+.sw { position: relative; width: 40px; height: 22px; flex-shrink: 0; }
+.sw input { display: none; }
+.sw-track { position: absolute; inset: 0; border-radius: 11px; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1); transition: 0.3s; }
+.sw-thumb { position: absolute; top: 3px; left: 3px; width: 14px; height: 14px; border-radius: 50%; background: rgba(255,255,255,0.25); transition: 0.3s; }
+.sw input:checked ~ .sw-track { background: rgba(255,32,64,0.2); border-color: rgba(255,32,64,0.5); }
+.sw input:checked ~ .sw-track .sw-thumb { left: 21px; background: var(--red); box-shadow: 0 0 8px var(--red); }
+/* purple SW */
+.sw.purple input:checked ~ .sw-track { background: rgba(168,85,247,0.2); border-color: rgba(168,85,247,0.5); }
+.sw.purple input:checked ~ .sw-track .sw-thumb { left: 21px; background: var(--purple); box-shadow: 0 0 8px var(--purple); }
+
+/* SLIDER */
+.slider-card {
+  background: var(--glass); border: 1px solid var(--glass-border); border-radius: 14px;
+  padding: 12px 14px;
+}
+.slider-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.slider-left-info { display: flex; align-items: center; gap: 12px; }
+.slider-num { font-family: 'DM Mono', monospace; font-size: 16px; color: var(--red2); }
+input[type=range] { -webkit-appearance: none; width: 100%; height: 3px; background: rgba(255,255,255,0.08); outline: none; border-radius: 2px; }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 3px rgba(255,32,64,0.3); }
+
+/* BOTTOM STATS */
+.bottom-bar {
+  height: 44px; background: rgba(0,0,0,0.4); border-top: 1px solid var(--glass-border);
+  display: flex; align-items: center; justify-content: space-between; padding: 0 16px;
+}
+.stat { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-dim); }
+.stat span { color: var(--red2); margin-left: 4px; }
+</style>
+</head>
+<body>
+
+<div class="app-container">
+  
+  <div class="header">
+    <div class="wordmark">TRUT<span>H</span></div>
+    <div class="header-actions">
+      <div class="action-btn" onclick="if(window.Android) Android.minimize()"><i class="fa-solid fa-minus"></i></div>
+      <div class="action-btn red" onclick="if(window.Android) Android.exit()"><i class="fa-solid fa-xmark"></i></div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="sel('dev')" id="t-dev"><i class="fa-solid fa-mobile-screen"></i></div>
+    <div class="tab" onclick="sel('perf')" id="t-perf"><i class="fa-solid fa-gauge-high"></i></div>
+    <div class="tab" onclick="sel('com')" id="t-com"><i class="fa-solid fa-crosshairs"></i></div>
+    <div class="tab" onclick="sel('ext')" id="t-ext"><i class="fa-solid fa-server"></i></div>
+  </div>
+
+  <div class="content">
+    
+    <!-- DEVICE -->
+    <div class="page active" id="p-dev">
+      <div class="row" id="r-regedit">
+        <div class="row-icon"><i class="fa-solid fa-sliders"></i></div>
+        <div class="row-info"><div class="row-name">Regedit Mobile</div><div class="row-sub">sensitivity override</div></div>
+        <label class="sw"><input type="checkbox" onchange="tgl(this,'r-regedit')"/><div class="sw-track"><div class="sw-thumb"></div></div></label>
+      </div>
+      <div class="row" id="r-sensi">
+        <div class="row-icon"><i class="fa-solid fa-bolt"></i></div>
+        <div class="row-info"><div class="row-name">Sensi Extrema</div><div class="row-sub">accel boost</div></div>
+        <label class="sw"><input type="checkbox" onchange="tgl(this,'r-sensi')"/><div class="sw-track"><div class="sw-thumb"></div></div></label>
+      </div>
+      <div class="row purple-row on" id="r-anti">
+        <div class="row-icon"><i class="fa-solid fa-shield"></i></div>
+        <div class="row-info"><div class="row-name">Anti-Blacklist</div><div class="row-sub">protection active</div></div>
+        <label class="sw purple"><input type="checkbox" checked onchange="tgl(this,'r-anti')"/><div class="sw-track"><div class="sw-thumb"></div></div></label>
+      </div>
+    </div>
+
+    <!-- PERFORMANCE -->
+    <div class="page" id="p-perf">
+      <div class="slider-card">
+        <div class="slider-top">
+          <div class="slider-left-info">
+            <div class="row-icon"><i class="fa-solid fa-expand"></i></div>
+            <div class="row-info"><div class="row-name">DPI Force</div><div class="row-sub">400-2000</div></div>
+          </div>
+          <div class="slider-num" id="dv">1200</div>
+        </div>
+        <input type="range" min="400" max="2000" value="1200" step="10" oninput="document.getElementById('dv').textContent=this.value"/>
+      </div>
+      <div class="slider-card">
+        <div class="slider-top">
+          <div class="slider-left-info">
+            <div class="row-icon"><i class="fa-solid fa-wave-square"></i></div>
+            <div class="row-info"><div class="row-name">Delay</div><div class="row-sub">0-100ms</div></div>
+          </div>
+          <div class="slider-num" id="sv">0ms</div>
+        </div>
+        <input type="range" min="0" max="100" value="0" step="1" oninput="document.getElementById('sv').textContent=this.value+'ms'"/>
+      </div>
+    </div>
+
+    <!-- COMBAT -->
+    <div class="page" id="p-com">
+      <div class="row" id="r-aim">
+        <div class="row-icon"><i class="fa-solid fa-bullseye"></i></div>
+        <div class="row-info"><div class="row-name">AimLock Direct</div><div class="row-sub">nearest lock</div></div>
+        <label class="sw"><input type="checkbox" onchange="tgl(this,'r-aim')"/><div class="sw-track"><div class="sw-thumb"></div></div></label>
+      </div>
+      <div class="row" id="r-hit">
+        <div class="row-icon"><i class="fa-solid fa-person-rays"></i></div>
+        <div class="row-info"><div class="row-name">Hitbox Expand</div><div class="row-sub">OBB scale</div></div>
+        <label class="sw"><input type="checkbox" onchange="tgl(this,'r-hit')"/><div class="sw-track"><div class="sw-thumb"></div></div></label>
+      </div>
+      <div class="row" id="r-mag">
+        <div class="row-icon"><i class="fa-solid fa-skull"></i></div>
+        <div class="row-info"><div class="row-name">Magic Bullet</div><div class="row-sub" style="color:#ff2040">HIGH RISK</div></div>
+        <label class="sw"><input type="checkbox" onchange="tgl(this,'r-mag')"/><div class="sw-track"><div class="sw-thumb"></div></div></label>
+      </div>
+    </div>
+
+    <!-- EXTERNAL -->
+    <div class="page" id="p-ext">
+      <div class="row purple-row" id="r-exta">
+        <div class="row-icon"><i class="fa-solid fa-network-wired"></i></div>
+        <div class="row-info"><div class="row-name">External Aimbot</div><div class="row-sub">kernel mem</div></div>
+        <label class="sw purple"><input type="checkbox" onchange="tgl(this,'r-exta')"/><div class="sw-track"><div class="sw-thumb"></div></div></label>
+      </div>
+      <div class="row" id="r-mac">
+        <div class="row-icon"><i class="fa-solid fa-mouse"></i></div>
+        <div class="row-info"><div class="row-name">No-Recoil Macro</div><div class="row-sub">hw bypass</div></div>
+        <label class="sw"><input type="checkbox" onchange="tgl(this,'r-mac')"/><div class="sw-track"><div class="sw-thumb"></div></div></label>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="bottom-bar">
+    <div class="stat">PING <span id="bp">14ms</span></div>
+    <div class="stat">ACTIVE <span id="ba">1</span></div>
+  </div>
+
+</div>
+
+<script>
+function sel(t) {
+  document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
+  document.getElementById('t-'+t).classList.add('active');
+  document.getElementById('p-'+t).classList.add('active');
+}
+function tgl(el, id) {
+  document.getElementById(id).classList.toggle('on', el.checked);
+  document.getElementById('ba').textContent = document.querySelectorAll('.sw input:checked').length;
+}
+setInterval(()=>{ document.getElementById('bp').textContent = (Math.random()*15+8|0)+'ms'; }, 3000);
+</script>
+</body>
+</html>
