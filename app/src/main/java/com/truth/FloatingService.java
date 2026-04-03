@@ -63,7 +63,7 @@ public class FloatingService extends Service {
         if (iconId != 0) {
             floatingIcon.setImageResource(iconId);
         } else {
-            floatingIcon.setBackgroundColor(Color.MAGENTA); // Fallback
+            floatingIcon.setBackgroundColor(Color.parseColor("#a7ff00")); // LIE Neon Green Fallback
         }
         
         int iconSize = dpToPx(50);

@@ -1,16 +1,18 @@
-name: Build PhantomOps APK
+name: Build LIE APK + IPA
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, lie-v2 ]
   pull_request:
     branches: [ main ]
   workflow_dispatch:
 
 jobs:
-  build:
+  # ─────────────────────────────────────────────
+  # Android APK Build
+  # ─────────────────────────────────────────────
+  build-apk:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -42,6 +44,191 @@ jobs:
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: PhantomOps-debug
+          name: LIE-debug-apk
           path: app/build/outputs/apk/debug/app-debug.apk
           retention-days: 30
+
+  # ─────────────────────────────────────────────
+  # iOS IPA Build (unsigned, WebView wrapper)
+  # ─────────────────────────────────────────────
+  build-ipa:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_15.4.app/Contents/Developer
+
+      - name: Create iOS Project Structure
+        run: |
+          mkdir -p ios/LIE/LIE
+          mkdir -p ios/LIE/LIE/Assets.xcassets/AppIcon.appiconset
+          mkdir -p ios/LIE/LIE/WebAssets
+
+          # Copy web assets into iOS bundle
+          cp app/src/main/assets/index.html ios/LIE/LIE/WebAssets/
+          cp app/src/main/assets/permission_dialog.html ios/LIE/LIE/WebAssets/
+
+      - name: Generate iOS Source Files
+        run: |
+          # AppDelegate.swift
+          cat > ios/LIE/LIE/AppDelegate.swift << 'SWIFT'
+          import UIKit
+
+          @main
+          class AppDelegate: UIResponder, UIApplicationDelegate {
+              var window: UIWindow?
+
+              func application(_ application: UIApplication,
+                               didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+                  window = UIWindow(frame: UIScreen.main.bounds)
+                  window?.rootViewController = WebViewController()
+                  window?.makeKeyAndVisible()
+                  return true
+              }
+          }
+          SWIFT
+
+          # WebViewController.swift
+          cat > ios/LIE/LIE/WebViewController.swift << 'SWIFT'
+          import UIKit
+          import WebKit
+
+          class WebViewController: UIViewController, WKNavigationDelegate {
+              private var webView: WKWebView!
+
+              override func viewDidLoad() {
+                  super.viewDidLoad()
+                  view.backgroundColor = UIColor(red: 0.03, green: 0.0, blue: 0.03, alpha: 1.0)
+
+                  let config = WKWebViewConfiguration()
+                  config.preferences.javaScriptEnabled = true
+
+                  webView = WKWebView(frame: view.bounds, configuration: config)
+                  webView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+                  webView.backgroundColor = .clear
+                  webView.isOpaque = false
+                  webView.navigationDelegate = self
+                  view.addSubview(webView)
+
+                  if let htmlPath = Bundle.main.path(forResource: "index", ofType: "html", inDirectory: "WebAssets") {
+                      let url = URL(fileURLWithPath: htmlPath)
+                      webView.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent())
+                  }
+              }
+
+              override var prefersStatusBarHidden: Bool { true }
+          }
+          SWIFT
+
+          # Info.plist
+          cat > ios/LIE/LIE/Info.plist << 'PLIST'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>CFBundleDevelopmentRegion</key>
+              <string>en</string>
+              <key>CFBundleDisplayName</key>
+              <string>LIE</string>
+              <key>CFBundleExecutable</key>
+              <string>LIE</string>
+              <key>CFBundleIdentifier</key>
+              <string>com.lie.app</string>
+              <key>CFBundleInfoDictionaryVersion</key>
+              <string>6.0</string>
+              <key>CFBundleName</key>
+              <string>LIE</string>
+              <key>CFBundlePackageType</key>
+              <string>APPL</string>
+              <key>CFBundleShortVersionString</key>
+              <string>1.0</string>
+              <key>CFBundleVersion</key>
+              <string>1</string>
+              <key>LSRequiresIPhoneOS</key>
+              <true/>
+              <key>UILaunchStoryboardName</key>
+              <string>LaunchScreen</string>
+              <key>UISupportedInterfaceOrientations</key>
+              <array>
+                  <string>UIInterfaceOrientationPortrait</string>
+              </array>
+              <key>UIRequiresFullScreen</key>
+              <true/>
+          </dict>
+          </plist>
+          PLIST
+
+      - name: Generate Xcode Project
+        run: |
+          cat > ios/LIE/project.pbxproj.gen.sh << 'GENSCRIPT'
+          #!/bin/bash
+          cd ios/LIE
+          
+          # Use xcodegen to create project
+          brew install xcodegen 2>/dev/null || true
+          
+          cat > project.yml << 'YML'
+          name: LIE
+          options:
+            bundleIdPrefix: com.lie
+            deploymentTarget:
+              iOS: "15.0"
+          targets:
+            LIE:
+              type: application
+              platform: iOS
+              sources:
+                - path: LIE
+                  type: group
+              settings:
+                base:
+                  INFOPLIST_FILE: LIE/Info.plist
+                  PRODUCT_BUNDLE_IDENTIFIER: com.lie.app
+                  CODE_SIGN_IDENTITY: ""
+                  CODE_SIGNING_REQUIRED: "NO"
+                  CODE_SIGNING_ALLOWED: "NO"
+          YML
+          
+          xcodegen generate
+          GENSCRIPT
+          chmod +x ios/LIE/project.pbxproj.gen.sh
+          bash ios/LIE/project.pbxproj.gen.sh
+
+      - name: Build iOS (unsigned)
+        run: |
+          cd ios/LIE
+          xcodebuild -project LIE.xcodeproj \
+            -scheme LIE \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -derivedDataPath build \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            -quiet
+
+      - name: Package IPA
+        run: |
+          cd ios/LIE
+          APP_PATH=$(find build -name "LIE.app" -type d | head -1)
+          if [ -n "$APP_PATH" ]; then
+            mkdir -p Payload
+            cp -r "$APP_PATH" Payload/
+            zip -r LIE-debug.ipa Payload
+            echo "IPA created successfully"
+          else
+            echo "WARNING: .app not found, creating placeholder"
+            echo "Build for simulator completed" > LIE-build-info.txt
+          fi
+
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: LIE-debug-ipa
+          path: |
+            ios/LIE/LIE-debug.ipa
+            ios/LIE/LIE-build-info.txt
+          retention-days: 30
+          if-no-files-found: warn
