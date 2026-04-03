@@ -18,9 +18,9 @@
 }
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
-/* The body is transparent so we only see the menu container */
+/* The body is solid so it always renders */
 html, body {
-  background: transparent;
+  background: #0A0008;
   width: 100vw;
   height: 100vh;
   overflow: hidden;
@@ -33,9 +33,7 @@ html, body {
 .app-container {
   width: 340px;
   height: 480px;
-  background: rgba(10,0,8,0.85);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: #0A0008;
   border: 1px solid var(--glass-border);
   border-radius: 20px;
   display: flex;

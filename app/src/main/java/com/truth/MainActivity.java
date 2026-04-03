@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.os.Process;
 import android.provider.Settings;
 import android.text.TextUtils;
+import android.view.View;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -33,6 +34,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
         prefs = getSharedPreferences("LIE_PREFS", MODE_PRIVATE);
 
         if (!prefs.getBoolean("permissions_accepted", false)) {
@@ -44,9 +46,13 @@ public class MainActivity extends Activity {
 
     private void showConsentDialog() {
         WebView webView = new WebView(this);
-        webView.setBackgroundColor(Color.TRANSPARENT);
+        webView.setBackgroundColor(Color.parseColor("#0A0A0F"));
+        webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
         webView.getSettings().setJavaScriptEnabled(true);
         webView.getSettings().setDomStorageEnabled(true);
+        webView.getSettings().setDatabaseEnabled(true);
+        webView.getSettings().setAllowFileAccess(true);
+        webView.getSettings().setAllowContentAccess(true);
         webView.addJavascriptInterface(new Object() {
             @JavascriptInterface
             public void acceptPermissions() {

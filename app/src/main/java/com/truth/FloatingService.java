@@ -116,15 +116,19 @@ public class FloatingService extends Service {
         int webHeight = dpToPx(480);
         FrameLayout.LayoutParams webParams = new FrameLayout.LayoutParams(webWidth, webHeight);
         webView.setLayoutParams(webParams);
-        webView.setBackgroundColor(Color.TRANSPARENT);
+        webView.setBackgroundColor(Color.parseColor("#0A0008"));
 
         WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);
         settings.setDomStorageEnabled(true);
+        settings.setDatabaseEnabled(true);
+        settings.setAllowFileAccess(true);
+        settings.setAllowContentAccess(true);
         settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
 
         webView.setWebViewClient(new WebViewClient());
         webView.addJavascriptInterface(new WebAppInterface(), "Android");
+        webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
         webView.loadUrl("file:///android_asset/index.html");
         
         webView.setVisibility(View.GONE); // Start minimized
@@ -167,6 +171,11 @@ public class FloatingService extends Service {
     private void expandMenu() {
         floatingIcon.setVisibility(View.GONE);
         webView.setVisibility(View.VISIBLE);
+        
+        // Force window update to accommodate larger WebView
+        params.width = dpToPx(340);
+        params.height = dpToPx(480);
+        windowManager.updateViewLayout(rootContainer, params);
     }
 
     public void minimizeMenu() {
@@ -176,6 +185,11 @@ public class FloatingService extends Service {
                 public void run() {
                     webView.setVisibility(View.GONE);
                     floatingIcon.setVisibility(View.VISIBLE);
+                    
+                    // Reset window size for the icon
+                    params.width = WindowManager.LayoutParams.WRAP_CONTENT;
+                    params.height = WindowManager.LayoutParams.WRAP_CONTENT;
+                    windowManager.updateViewLayout(rootContainer, params);
                 }
             });
         }
