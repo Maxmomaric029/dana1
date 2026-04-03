@@ -4,8 +4,6 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 <title>LIE</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 <style>
 :root {
   --neon-green: #a7ff00;
@@ -18,13 +16,12 @@
 }
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
-/* The body is solid so it always renders */
 html, body {
   background: #0A0008;
   width: 100vw;
   height: 100vh;
   overflow: hidden;
-  font-family: 'Syne', sans-serif;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
   color: var(--text);
   user-select: none;
 }
@@ -38,12 +35,12 @@ html, body {
   border-radius: 20px;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 0 30px rgba(0,0,0,0.5), inset 0 0 20px rgba(167,255,0,0.05);
+  box-shadow: 0 0 30px rgba(0,0,0,0.8), inset 0 0 20px rgba(167,255,0,0.04);
   overflow: hidden;
   position: relative;
 }
 
-/* HEADER (Draggable Area in Android) */
+/* HEADER */
 .header {
   height: 60px;
   display: flex;
@@ -54,7 +51,7 @@ html, body {
   border-bottom: 1px solid var(--glass-border);
 }
 .wordmark { font-size: 20px; font-weight: 800; letter-spacing: 4px; color: #fff; }
-.wordmark span { color: var(--neon-green); }
+.wordmark span { color: var(--neon-green); text-shadow: 0 0 12px rgba(167,255,0,0.6); }
 .header-actions { display: flex; gap: 8px; }
 .action-btn {
   width: 28px; height: 28px;
@@ -64,10 +61,11 @@ html, body {
   color: var(--text-dim);
   display: flex; align-items: center; justify-content: center;
   cursor: pointer;
+  font-size: 14px; font-weight: bold; line-height: 1;
   transition: background 0.2s;
 }
 .action-btn:active { background: var(--glass-hover); }
-.action-btn.red { color: var(--cyber-cyan); }
+.action-btn.cyan { color: var(--cyber-cyan); }
 
 /* TABS */
 .tabs {
@@ -83,12 +81,13 @@ html, body {
   text-align: center;
   border-radius: 12px;
   color: var(--text-dim);
-  font-size: 14px;
+  font-size: 13px;
   transition: 0.2s;
   cursor: pointer;
+  letter-spacing: 0.5px;
 }
 .tab.active {
-  background: rgba(167,255,0,0.15);
+  background: rgba(167,255,0,0.12);
   color: var(--neon-green);
 }
 
@@ -97,40 +96,37 @@ html, body {
   flex: 1;
   overflow-y: auto;
   padding: 12px;
-  /* hide scrollbar */
   -ms-overflow-style: none; scrollbar-width: none;
 }
 .content::-webkit-scrollbar { display: none; }
 
-.page { display: none; flex-direction: column; gap: 8px; animation: fade 0.3s; }
+.page { display: none; flex-direction: column; gap: 8px; }
 .page.active { display: flex; }
-@keyframes fade { from{opacity:0; transform:translateY(8px)} to{opacity:1; transform:none} }
 
-/* ROW (Switches) Same style as original but smaller */
+/* ROW */
 .row {
   display: flex; align-items: center; padding: 12px 14px; gap: 12px;
   background: var(--glass); border: 1px solid var(--glass-border); border-radius: 14px;
 }
 .row-icon {
   width: 32px; height: 32px; border-radius: 10px; background: rgba(255,255,255,0.06);
-  display: flex; align-items: center; justify-content: center; font-size: 13px; color: var(--text-dim);
+  display: flex; align-items: center; justify-content: center; font-size: 15px; color: var(--text-dim);
 }
 .row.on .row-icon { background: rgba(167,255,0,0.15); color: var(--neon-green); }
-.row.purple-row.on .row-icon { background: rgba(0,240,255,0.15); color: var(--cyber-cyan); }
+.row.cyan-row.on .row-icon { background: rgba(0,240,255,0.15); color: var(--cyber-cyan); }
 .row-info { flex: 1; min-width: 0; }
 .row-name { font-size: 13px; font-weight: 700; letter-spacing: 0.2px; }
-.row-sub { font-size: 10px; color: var(--text-dim); font-family: 'DM Mono', monospace; margin-top: 2px; }
+.row-sub { font-size: 10px; color: var(--text-dim); font-family: monospace; margin-top: 2px; }
 
-/* SW (Switch) */
+/* SWITCH */
 .sw { position: relative; width: 40px; height: 22px; flex-shrink: 0; }
 .sw input { display: none; }
 .sw-track { position: absolute; inset: 0; border-radius: 11px; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1); transition: 0.3s; }
 .sw-thumb { position: absolute; top: 3px; left: 3px; width: 14px; height: 14px; border-radius: 50%; background: rgba(255,255,255,0.25); transition: 0.3s; }
 .sw input:checked ~ .sw-track { background: rgba(167,255,0,0.2); border-color: rgba(167,255,0,0.5); }
 .sw input:checked ~ .sw-track .sw-thumb { left: 21px; background: var(--neon-green); box-shadow: 0 0 8px var(--neon-green); }
-/* purple SW */
-.sw.purple input:checked ~ .sw-track { background: rgba(0,240,255,0.2); border-color: rgba(0,240,255,0.5); }
-.sw.purple input:checked ~ .sw-track .sw-thumb { left: 21px; background: var(--cyber-cyan); box-shadow: 0 0 8px var(--cyber-cyan); }
+.sw.cyan input:checked ~ .sw-track { background: rgba(0,240,255,0.2); border-color: rgba(0,240,255,0.5); }
+.sw.cyan input:checked ~ .sw-track .sw-thumb { left: 21px; background: var(--cyber-cyan); box-shadow: 0 0 8px var(--cyber-cyan); }
 
 /* SLIDER */
 .slider-card {
@@ -139,56 +135,56 @@ html, body {
 }
 .slider-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
 .slider-left-info { display: flex; align-items: center; gap: 12px; }
-.slider-num { font-family: 'DM Mono', monospace; font-size: 16px; color: var(--neon-green); }
+.slider-num { font-family: monospace; font-size: 16px; color: var(--neon-green); }
 input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 3px; background: rgba(255,255,255,0.08); outline: none; border-radius: 2px; }
 input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 16px; height: 16px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 3px rgba(167,255,0,0.3); }
 
-/* BOTTOM STATS */
+/* BOTTOM BAR */
 .bottom-bar {
   height: 44px; background: rgba(0,0,0,0.4); border-top: 1px solid var(--glass-border);
   display: flex; align-items: center; justify-content: space-between; padding: 0 16px;
 }
-.stat { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-dim); }
+.stat { font-family: monospace; font-size: 11px; color: var(--text-dim); }
 .stat span { color: var(--neon-green); margin-left: 4px; }
 </style>
 </head>
 <body>
 
 <div class="app-container">
-  
+
   <div class="header">
     <div class="wordmark">LI<span>E</span></div>
     <div class="header-actions">
-      <div class="action-btn" onclick="if(window.Android) Android.minimize()"><i class="fa-solid fa-minus"></i></div>
-      <div class="action-btn red" onclick="if(window.Android) Android.exit()"><i class="fa-solid fa-xmark"></i></div>
+      <div class="action-btn" onclick="if(window.Android) Android.minimize()">&#8722;</div>
+      <div class="action-btn cyan" onclick="if(window.Android) Android.exit()">&#215;</div>
     </div>
   </div>
 
   <div class="tabs">
-    <div class="tab active" onclick="sel('dev')" id="t-dev"><i class="fa-solid fa-mobile-screen"></i></div>
-    <div class="tab" onclick="sel('perf')" id="t-perf"><i class="fa-solid fa-gauge-high"></i></div>
-    <div class="tab" onclick="sel('com')" id="t-com"><i class="fa-solid fa-crosshairs"></i></div>
-    <div class="tab" onclick="sel('ext')" id="t-ext"><i class="fa-solid fa-server"></i></div>
+    <div class="tab active" onclick="sel('dev')" id="t-dev">DEV</div>
+    <div class="tab" onclick="sel('perf')" id="t-perf">PERF</div>
+    <div class="tab" onclick="sel('com')" id="t-com">COM</div>
+    <div class="tab" onclick="sel('ext')" id="t-ext">EXT</div>
   </div>
 
   <div class="content">
-    
+
     <!-- DEVICE -->
     <div class="page active" id="p-dev">
       <div class="row" id="r-regedit">
-        <div class="row-icon"><i class="fa-solid fa-sliders"></i></div>
+        <div class="row-icon">&#9881;</div>
         <div class="row-info"><div class="row-name">Regedit Mobile</div><div class="row-sub">sensitivity override</div></div>
         <label class="sw"><input type="checkbox" onchange="tgl(this,'r-regedit')"/><div class="sw-track"><div class="sw-thumb"></div></div></label>
       </div>
       <div class="row" id="r-sensi">
-        <div class="row-icon"><i class="fa-solid fa-bolt"></i></div>
+        <div class="row-icon">&#9889;</div>
         <div class="row-info"><div class="row-name">Sensi Extrema</div><div class="row-sub">accel boost</div></div>
         <label class="sw"><input type="checkbox" onchange="tgl(this,'r-sensi')"/><div class="sw-track"><div class="sw-thumb"></div></div></label>
       </div>
-      <div class="row purple-row on" id="r-anti">
-        <div class="row-icon"><i class="fa-solid fa-shield"></i></div>
+      <div class="row cyan-row on" id="r-anti">
+        <div class="row-icon">&#128737;</div>
         <div class="row-info"><div class="row-name">Anti-Blacklist</div><div class="row-sub">protection active</div></div>
-        <label class="sw purple"><input type="checkbox" checked onchange="tgl(this,'r-anti')"/><div class="sw-track"><div class="sw-thumb"></div></div></label>
+        <label class="sw cyan"><input type="checkbox" checked onchange="tgl(this,'r-anti')"/><div class="sw-track"><div class="sw-thumb"></div></div></label>
       </div>
     </div>
 
@@ -197,7 +193,7 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: 
       <div class="slider-card">
         <div class="slider-top">
           <div class="slider-left-info">
-            <div class="row-icon"><i class="fa-solid fa-expand"></i></div>
+            <div class="row-icon">&#8644;</div>
             <div class="row-info"><div class="row-name">DPI Force</div><div class="row-sub">400-2000</div></div>
           </div>
           <div class="slider-num" id="dv">1200</div>
@@ -207,7 +203,7 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: 
       <div class="slider-card">
         <div class="slider-top">
           <div class="slider-left-info">
-            <div class="row-icon"><i class="fa-solid fa-wave-square"></i></div>
+            <div class="row-icon">&#8987;</div>
             <div class="row-info"><div class="row-name">Delay</div><div class="row-sub">0-100ms</div></div>
           </div>
           <div class="slider-num" id="sv">0ms</div>
@@ -219,17 +215,17 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: 
     <!-- COMBAT -->
     <div class="page" id="p-com">
       <div class="row" id="r-aim">
-        <div class="row-icon"><i class="fa-solid fa-bullseye"></i></div>
+        <div class="row-icon">&#11835;</div>
         <div class="row-info"><div class="row-name">AimLock Direct</div><div class="row-sub">nearest lock</div></div>
         <label class="sw"><input type="checkbox" onchange="tgl(this,'r-aim')"/><div class="sw-track"><div class="sw-thumb"></div></div></label>
       </div>
       <div class="row" id="r-hit">
-        <div class="row-icon"><i class="fa-solid fa-person-rays"></i></div>
+        <div class="row-icon">&#9654;</div>
         <div class="row-info"><div class="row-name">Hitbox Expand</div><div class="row-sub">OBB scale</div></div>
         <label class="sw"><input type="checkbox" onchange="tgl(this,'r-hit')"/><div class="sw-track"><div class="sw-thumb"></div></div></label>
       </div>
       <div class="row" id="r-mag">
-        <div class="row-icon"><i class="fa-solid fa-skull"></i></div>
+        <div class="row-icon">&#9760;</div>
         <div class="row-info"><div class="row-name">Magic Bullet</div><div class="row-sub" style="color:#a7ff00">HIGH RISK</div></div>
         <label class="sw"><input type="checkbox" onchange="tgl(this,'r-mag')"/><div class="sw-track"><div class="sw-thumb"></div></div></label>
       </div>
@@ -237,13 +233,13 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: 
 
     <!-- EXTERNAL -->
     <div class="page" id="p-ext">
-      <div class="row purple-row" id="r-exta">
-        <div class="row-icon"><i class="fa-solid fa-network-wired"></i></div>
+      <div class="row cyan-row" id="r-exta">
+        <div class="row-icon">&#9775;</div>
         <div class="row-info"><div class="row-name">External Aimbot</div><div class="row-sub">kernel mem</div></div>
-        <label class="sw purple"><input type="checkbox" onchange="tgl(this,'r-exta')"/><div class="sw-track"><div class="sw-thumb"></div></div></label>
+        <label class="sw cyan"><input type="checkbox" onchange="tgl(this,'r-exta')"/><div class="sw-track"><div class="sw-thumb"></div></div></label>
       </div>
       <div class="row" id="r-mac">
-        <div class="row-icon"><i class="fa-solid fa-mouse"></i></div>
+        <div class="row-icon">&#128432;</div>
         <div class="row-info"><div class="row-name">No-Recoil Macro</div><div class="row-sub">hw bypass</div></div>
         <label class="sw"><input type="checkbox" onchange="tgl(this,'r-mac')"/><div class="sw-track"><div class="sw-thumb"></div></div></label>
       </div>
